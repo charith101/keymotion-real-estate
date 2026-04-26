@@ -126,7 +126,7 @@ export function FilterSidebar({ filters, onFilterChange }: FilterSidebarProps) {
               onValueChange={([min, max]) => {
                 updateLocal({ 
                   minPrice: min > 0 ? min : undefined,
-                  maxPrice: max < 500000000 ? max : undefined,
+                  maxPrice: max < 100000000 ? max : undefined,
                 });
               }}
               className="w-full"

@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTheme } from 'next-themes';
 import { Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,8 +15,17 @@ interface HeroSectionProps {
 
 export function HeroSection({ exchangeRates }: HeroSectionProps) {
   const router = useRouter();
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
   const [listingType, setListingType] = useState<string>('sale');
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Avoid hydration mismatch — only read theme after mount
+  useEffect(() => setMounted(true), []);
+
+  const heroImage = mounted && resolvedTheme === 'dark'
+    ? '/images/beach2dark.png'
+    : '/images/beach2.jpg';
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,22 +36,21 @@ export function HeroSection({ exchangeRates }: HeroSectionProps) {
   };
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-secondary to-background py-20 md:py-32">
-      {/* Background Pattern */}
+    <section className="relative overflow-hidden bg-gradient-to-b from-secondary to-background min-h-[99vh] flex items-center py-24 md:py-36">
+      {/* Background Image — swaps based on dark / light mode */}
       <img
-  src="/images/beach2.jpg" // put your image in /public
-  alt="Background"
-  className="absolute inset-0 w-full h-full object-cover opacity-99"
-/>
+        src={heroImage}
+        alt="Background"
+        className="absolute inset-0 w-full h-full object-cover opacity-99 transition-opacity duration-500"
+      />
       
       <div className="container relative z-10">
         <div className="mx-auto max-w-3xl text-center">
           <h1 className="text-balance text-4xl font-bold tracking-tight text-foreground md:text-5xl lg:text-6xl">
-            Find Your Perfect Property in Sri Lanka
+            Buy, Sell, Rent, Lease, Search In Ahangama, Midigama, Kabalana
           </h1>
           <p className="mt-6 text-pretty text-lg text-muted-foreground md:text-xl">
-            Discover exceptional land, houses, apartments, and commercial properties. 
-            Your trusted partner for real estate across Sri Lanka and beyond.
+           For any Lands Villas, Actuve Businesses
           </p>
 
           {/* Search Form */}
@@ -54,13 +63,13 @@ export function HeroSection({ exchangeRates }: HeroSectionProps) {
               className="border-r-0 md:border-r md:pr-3"
             >
               <TabsList className="bg-transparent">
-                <TabsTrigger value="sale" className="rounded-full px-4 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                <TabsTrigger value="sale" className="rounded-full px-4 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground dark:data-[state=active]:bg-primary dark:data-[state=active]:text-primary-foreground">
                   Buy
                 </TabsTrigger>
-                <TabsTrigger value="rent" className="rounded-full px-4 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                <TabsTrigger value="rent" className="rounded-full px-4 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground dark:data-[state=active]:bg-primary dark:data-[state=active]:text-primary-foreground">
                   Rent
                 </TabsTrigger>
-                <TabsTrigger value="lease" className="rounded-full px-4 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                <TabsTrigger value="lease" className="rounded-full px-4 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground dark:data-[state=active]:bg-primary dark:data-[state=active]:text-primary-foreground">
                   Lease
                 </TabsTrigger>
               </TabsList>

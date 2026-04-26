@@ -35,23 +35,24 @@ export function ImageGallery({ images, title }: ImageGalleryProps) {
 
   return (
     <>
-      <section className="relative bg-muted">
-        {/* Main Image */}
-        <div className="relative aspect-[16/9] w-full md:aspect-[21/9]">
+      <section className="bg-background">
+        <div className="relative aspect-[16/9] w-full md:aspect-[21/9] bg-black">
           <Image
             src={images[currentIndex].url}
-            alt={images[currentIndex].alt}
+            alt={images[currentIndex].alt || title}
             fill
-            className="object-cover"
-            priority={currentIndex === 0}
+            className="object-contain md:object-cover"
+            priority
             sizes="100vw"
           />
           
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
+
           {/* Expand Button */}
           <Button
             variant="secondary"
             size="icon"
-            className="absolute right-4 top-4 bg-background/80 backdrop-blur-sm"
+            className="absolute right-4 top-4 bg-background/80 backdrop-blur-sm shadow-md z-10"
             onClick={() => setLightboxOpen(true)}
             aria-label="View full image"
           >
@@ -64,7 +65,7 @@ export function ImageGallery({ images, title }: ImageGalleryProps) {
               <Button
                 variant="secondary"
                 size="icon"
-                className="absolute left-4 top-1/2 -translate-y-1/2 bg-background/80 backdrop-blur-sm"
+                className="absolute left-4 top-1/2 -translate-y-1/2 bg-background/80 backdrop-blur-sm shadow-md z-10 hidden md:flex"
                 onClick={goToPrevious}
                 aria-label="Previous image"
               >
@@ -73,43 +74,47 @@ export function ImageGallery({ images, title }: ImageGalleryProps) {
               <Button
                 variant="secondary"
                 size="icon"
-                className="absolute right-4 top-1/2 -translate-y-1/2 bg-background/80 backdrop-blur-sm"
+                className="absolute right-4 top-1/2 -translate-y-1/2 bg-background/80 backdrop-blur-sm shadow-md z-10 hidden md:flex"
                 onClick={goToNext}
                 aria-label="Next image"
               >
                 <ChevronRight className="h-5 w-5" />
               </Button>
+              
+              {/* Mobile tap zones */}
+              <div className="absolute inset-y-0 left-0 w-1/4 z-0 md:hidden" onClick={goToPrevious} />
+              <div className="absolute inset-y-0 right-0 w-1/4 z-0 md:hidden" onClick={goToNext} />
             </>
           )}
 
           {/* Image Counter */}
-          <div className="absolute bottom-4 left-4 rounded-full bg-background/80 px-3 py-1 text-sm backdrop-blur-sm">
+          <div className="absolute bottom-4 right-4 rounded-full bg-black/70 px-3 py-1.5 text-sm font-medium text-white backdrop-blur-sm z-10 shadow-lg">
             {currentIndex + 1} / {images.length}
           </div>
         </div>
 
         {/* Thumbnail Strip */}
         {images.length > 1 && (
-          <div className="container py-4">
-            <div className="flex gap-2 overflow-x-auto pb-2">
+          <div className="container py-4 border-b">
+            <div className="flex gap-3 overflow-x-auto pb-2 hide-scrollbar">
               {images.map((image, index) => (
                 <button
                   key={image.id}
                   onClick={() => setCurrentIndex(index)}
                   className={cn(
-                    "relative h-16 w-24 flex-shrink-0 overflow-hidden rounded-md transition-all",
+                    "relative h-20 w-32 flex-shrink-0 overflow-hidden rounded-lg transition-all border-2",
                     currentIndex === index
-                      ? "ring-2 ring-primary ring-offset-2"
-                      : "opacity-70 hover:opacity-100"
+                      ? "border-primary"
+                      : "border-transparent opacity-60 hover:opacity-100 hover:border-primary/50"
                   )}
                   aria-label={`View image ${index + 1}`}
                 >
                   <Image
                     src={image.url}
-                    alt={image.alt}
+                    alt={image.alt || title}
                     fill
                     className="object-cover"
-                    sizes="96px"
+                    sizes="128px"
                   />
                 </button>
               ))}
@@ -120,24 +125,26 @@ export function ImageGallery({ images, title }: ImageGalleryProps) {
 
       {/* Lightbox Dialog */}
       <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
-        <DialogContent className="max-w-[95vw] max-h-[95vh] p-0 bg-black/95 border-none">
+        <DialogContent className="max-w-[100vw] max-h-[100dvh] h-[100dvh] w-[100vw] p-0 bg-black/95 border-none rounded-none flex flex-col m-0 sm:rounded-none">
           <DialogTitle className="sr-only">{title} - Image Gallery</DialogTitle>
           <DialogDescription className="sr-only">
             Full screen image viewer. Use arrow keys or buttons to navigate between images.
           </DialogDescription>
-          <div className="relative h-[90vh] w-full">
+          
+          <div className="relative flex-1 w-full h-full flex items-center justify-center overflow-hidden touch-none">
             <Image
               src={images[currentIndex].url}
-              alt={images[currentIndex].alt}
+              alt={images[currentIndex].alt || title}
               fill
               className="object-contain"
-              sizes="95vw"
+              sizes="100vw"
+              priority
             />
             
             <Button
               variant="ghost"
               size="icon"
-              className="absolute right-2 top-2 text-white hover:bg-white/20"
+              className="absolute right-4 top-4 text-white hover:bg-white/20 z-50 bg-black/20 backdrop-blur-sm rounded-full"
               onClick={() => setLightboxOpen(false)}
               aria-label="Close lightbox"
             >
@@ -149,7 +156,7 @@ export function ImageGallery({ images, title }: ImageGalleryProps) {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="absolute left-4 top-1/2 -translate-y-1/2 text-white hover:bg-white/20"
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-white hover:bg-white/20 h-12 w-12 rounded-full hidden sm:flex bg-black/20 backdrop-blur-sm z-50"
                   onClick={goToPrevious}
                   aria-label="Previous image"
                 >
@@ -158,16 +165,20 @@ export function ImageGallery({ images, title }: ImageGalleryProps) {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-white hover:bg-white/20"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-white hover:bg-white/20 h-12 w-12 rounded-full hidden sm:flex bg-black/20 backdrop-blur-sm z-50"
                   onClick={goToNext}
                   aria-label="Next image"
                 >
                   <ChevronRight className="h-8 w-8" />
                 </Button>
+                
+                {/* Mobile tap zones */}
+                <div className="absolute inset-y-0 left-0 w-1/3 sm:hidden z-10" onClick={goToPrevious} />
+                <div className="absolute inset-y-0 right-0 w-1/3 sm:hidden z-10" onClick={goToNext} />
               </>
             )}
 
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full bg-black/60 px-4 py-2 text-sm text-white">
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 rounded-full bg-black/70 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm z-50 shadow-lg">
               {currentIndex + 1} / {images.length}
             </div>
           </div>

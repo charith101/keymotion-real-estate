@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Separator } from '@/components/ui/separator';
 import { PropertyCard } from '@/components/PropertyCard';
 import { FilterSidebar } from './FilterSidebar';
-import { filterProperties, mockProperties } from '@/lib/mock-data';
+import { mockProperties } from '@/lib/mock-data';
 import type { PropertyFilters, ListingType, PropertyType } from '@/lib/types';
 
 interface PropertiesClientProps {
@@ -19,44 +19,89 @@ interface PropertiesClientProps {
   initialCount?: number;
 }
 
+/**
+ * Maps from the client-side PropertyFilters shape (lib/types.ts) to
+ * the URL param keys that getProperties() in lib/queries/properties.ts reads.
+ *
+ * Client shape  →  URL param key
+ * listingType   →  listing
+ * propertyTypes →  type  (comma-separated)
+ * minPrice      →  min_price
+ * maxPrice      →  max_price
+ * bedrooms      →  beds
+ * search        →  search  (same)
+ * sort          →  sort    (same)
+ */
+
 export function PropertiesClient({ initialProperties, initialCount }: PropertiesClientProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [searchInput, setSearchInput] = useState(searchParams.get('search') || '');
 
-  // Parse filters from URL
+  // Parse the current URL params back into the client-side PropertyFilters shape.
+  // URL params use the server keys: listing, type, min_price, max_price, beds.
   const filters: PropertyFilters = useMemo(() => {
-    const propertyTypesParam = searchParams.get('propertyTypes');
+    const typeParam = searchParams.get('type');
     return {
       search: searchParams.get('search') || undefined,
-      listingType: (searchParams.get('listingType') as ListingType) || undefined,
-      propertyTypes: propertyTypesParam ? propertyTypesParam.split(',') as PropertyType[] : undefined,
+      listingType: (searchParams.get('listing') as ListingType) || undefined,
+      propertyTypes: typeParam ? (typeParam.split(',') as PropertyType[]) : undefined,
       district: searchParams.get('district') || undefined,
-      minPrice: searchParams.get('minPrice') ? Number(searchParams.get('minPrice')) : undefined,
-      maxPrice: searchParams.get('maxPrice') ? Number(searchParams.get('maxPrice')) : undefined,
-      bedrooms: searchParams.get('bedrooms') ? Number(searchParams.get('bedrooms')) : undefined,
+      minPrice: searchParams.get('min_price') ? Number(searchParams.get('min_price')) : undefined,
+      maxPrice: searchParams.get('max_price') ? Number(searchParams.get('max_price')) : undefined,
+      bedrooms: searchParams.get('beds') ? Number(searchParams.get('beds')) : undefined,
       sort: (searchParams.get('sort') as PropertyFilters['sort']) || undefined,
     };
   }, [searchParams]);
 
-  const filteredProperties = useMemo(() => {
-    if (initialProperties && initialProperties.length >= 0) return initialProperties
-    return filterProperties(filters)
-  }, [filters, initialProperties]);
+  // Use server-fetched results; fall back to mock data only when no server data exists.
+  const displayedProperties = useMemo(() => {
+    if (initialProperties && initialProperties.length >= 0) return initialProperties;
+    return mockProperties.filter(p => p.status === 'active');
+  }, [initialProperties]);
 
+  /**
+   * Convert the client-side PropertyFilters shape into the URL param keys
+   * that the server's getProperties() function reads.
+   */
   const updateFilters = (newFilters: Partial<PropertyFilters>) => {
     const params = new URLSearchParams(searchParams.toString());
-    
-    Object.entries(newFilters).forEach(([key, value]) => {
-      if (value === undefined || value === null || value === '' || (Array.isArray(value) && value.length === 0)) {
+
+    // Helper to set or delete a param
+    const set = (key: string, value: string | undefined | null) => {
+      if (value === undefined || value === null || value === '') {
         params.delete(key);
-      } else if (Array.isArray(value)) {
-        params.set(key, value.join(','));
       } else {
-        params.set(key, String(value));
+        params.set(key, value);
       }
-    });
+    };
+
+    if ('search' in newFilters) {
+      set('search', newFilters.search);
+    }
+    if ('listingType' in newFilters) {
+      set('listing', newFilters.listingType);
+    }
+    if ('propertyTypes' in newFilters) {
+      const types = newFilters.propertyTypes;
+      set('type', types && types.length > 0 ? types.join(',') : undefined);
+    }
+    if ('district' in newFilters) {
+      set('district', newFilters.district);
+    }
+    if ('minPrice' in newFilters) {
+      set('min_price', newFilters.minPrice !== undefined ? String(newFilters.minPrice) : undefined);
+    }
+    if ('maxPrice' in newFilters) {
+      set('max_price', newFilters.maxPrice !== undefined ? String(newFilters.maxPrice) : undefined);
+    }
+    if ('bedrooms' in newFilters) {
+      set('beds', newFilters.bedrooms !== undefined ? String(newFilters.bedrooms) : undefined);
+    }
+    if ('sort' in newFilters) {
+      set('sort', newFilters.sort);
+    }
 
     router.push(`/properties?${params.toString()}`, { scroll: false });
   };
@@ -71,7 +116,9 @@ export function PropertiesClient({ initialProperties, initialCount }: Properties
     updateFilters({ search: searchInput || undefined });
   };
 
-  const hasActiveFilters = Object.values(filters).some(v => v !== undefined && v !== '' && (!Array.isArray(v) || v.length > 0));
+  const hasActiveFilters = Object.values(filters).some(
+    v => v !== undefined && v !== '' && (!Array.isArray(v) || v.length > 0)
+  );
 
   return (
     <div className="container py-8">
@@ -138,7 +185,7 @@ export function PropertiesClient({ initialProperties, initialCount }: Properties
               onClick={() => updateFilters({ listingType: undefined })}
               className="h-7 gap-1"
             >
-              {filters.listingType === 'sale' ? 'For Sale' : 'For Rent'}
+              {filters.listingType === 'sale' ? 'For Sale' : filters.listingType === 'rent' ? 'For Rent' : 'For Lease'}
               <X className="h-3 w-3" />
             </Button>
           )}
@@ -164,6 +211,28 @@ export function PropertiesClient({ initialProperties, initialCount }: Properties
               className="h-7 gap-1"
             >
               {filters.district}
+              <X className="h-3 w-3" />
+            </Button>
+          )}
+          {filters.bedrooms && (
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => updateFilters({ bedrooms: undefined })}
+              className="h-7 gap-1"
+            >
+              {filters.bedrooms}+ beds
+              <X className="h-3 w-3" />
+            </Button>
+          )}
+          {(filters.minPrice !== undefined || filters.maxPrice !== undefined) && (
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => updateFilters({ minPrice: undefined, maxPrice: undefined })}
+              className="h-7 gap-1"
+            >
+              Price range
               <X className="h-3 w-3" />
             </Button>
           )}
@@ -197,7 +266,7 @@ export function PropertiesClient({ initialProperties, initialCount }: Properties
           {/* Results Count & Sort */}
           <div className="mb-6 flex items-center justify-between">
             <p className="text-sm text-muted-foreground">
-              Showing <span className="font-medium text-foreground">{filteredProperties.length}</span> of{' '}
+              Showing <span className="font-medium text-foreground">{displayedProperties.length}</span> of{' '}
               <span className="font-medium text-foreground">{initialCount ?? mockProperties.filter(p => p.status === 'active').length}</span> properties
             </p>
             <Select
@@ -219,9 +288,9 @@ export function PropertiesClient({ initialProperties, initialCount }: Properties
           </div>
 
           {/* Property Grid */}
-          {filteredProperties.length > 0 ? (
+          {displayedProperties.length > 0 ? (
             <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-              {filteredProperties.map((property) => (
+              {displayedProperties.map((property) => (
                 <PropertyCard key={property.id} property={property} />
               ))}
             </div>

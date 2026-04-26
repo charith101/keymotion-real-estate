@@ -8,7 +8,9 @@ interface QuickStatsProps {
 export function QuickStats({ property }: QuickStatsProps) {
   const stats = [];
 
-  if (property.bedrooms !== undefined) {
+  const isLand = property.propertyType === 'land';
+
+  if (!isLand && property.bedrooms !== undefined && property.bedrooms !== null) {
     stats.push({
       icon: Bed,
       label: 'Bedrooms',
@@ -16,7 +18,7 @@ export function QuickStats({ property }: QuickStatsProps) {
     });
   }
 
-  if (property.bathrooms !== undefined) {
+  if (!isLand && property.bathrooms !== undefined && property.bathrooms !== null) {
     stats.push({
       icon: Bath,
       label: 'Bathrooms',
@@ -24,7 +26,7 @@ export function QuickStats({ property }: QuickStatsProps) {
     });
   }
 
-  if (property.landArea !== undefined) {
+  if (property.landArea !== undefined && property.landArea !== null) {
     stats.push({
       icon: MapPin,
       label: 'Land Area',
@@ -32,7 +34,7 @@ export function QuickStats({ property }: QuickStatsProps) {
     });
   }
 
-  if (property.floorArea !== undefined) {
+  if (!isLand && property.floorArea !== undefined && property.floorArea !== null) {
     stats.push({
       icon: Maximize,
       label: 'Floor Area',

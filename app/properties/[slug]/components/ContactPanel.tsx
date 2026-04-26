@@ -17,7 +17,7 @@ interface ContactPanelProps {
 }
 
 export function ContactPanel({ property }: ContactPanelProps) {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -55,11 +55,19 @@ export function ContactPanel({ property }: ContactPanelProps) {
           <CardTitle className="text-lg">Contact Agent</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          <Button className="w-full" asChild>
-            <a href="https://wa.me/94712345678" target="_blank" rel="noopener noreferrer">
-              <MessageCircle className="mr-2 h-4 w-4" />
-              WhatsApp
-            </a>
+          <Button 
+            className="w-full" 
+            onClick={(e) => {
+              e.preventDefault();
+              const url = typeof window !== 'undefined' ? window.location.href : '';
+              const userName = user?.name || 'A potential buyer';
+              const messageText = `Hi, I'm interested in the property: "${property.title}".\nLink: ${url}\nMy name is: ${userName}`;
+              const encodedMessage = encodeURIComponent(messageText);
+              window.open(`https://wa.me/94727812370?text=${encodedMessage}`, '_blank', 'noopener,noreferrer');
+            }}
+          >
+            <MessageCircle className="mr-2 h-4 w-4" />
+            Send A Message In WhatsApp
           </Button>
           <Button variant="outline" className="w-full" asChild>
             <a href="tel:+94112345678">
@@ -67,7 +75,7 @@ export function ContactPanel({ property }: ContactPanelProps) {
               +94 11 234 5678
             </a>
           </Button>
-          {isAuthenticated ? (
+          {/* {isAuthenticated ? (
             <Button variant="secondary" className="w-full" onClick={handleSiteVisit}>
               <Calendar className="mr-2 h-4 w-4" />
               Request Site Visit
@@ -79,11 +87,43 @@ export function ContactPanel({ property }: ContactPanelProps) {
                 Login to Request Visit
               </Link>
             </Button>
-          )}
+          )} */}
         </CardContent>
       </Card>
 
-      {/* Inquiry Form */}
+      {/* Lawyer Card */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>
+            Legal Representative
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary font-bold text-lg">
+              AR
+            </div>
+            <div>
+              <p className="font-semibold text-base">Atty. Ben Jack</p>
+              <p className="text-sm text-muted-foreground">Licensed Attorney-at-Law</p>
+            </div>
+          </div>
+          <div className="rounded-lg border bg-muted/50 p-3 space-y-2">
+            <div className="flex items-center gap-2 text-sm">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-muted-foreground"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>
+              <span className="text-muted-foreground">Legal Scheme:</span>
+            </div>
+            <p className="font-medium text-sm">Title Verification & Transfer under Notarial Act No. 2 of 1907</p>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            All property transactions are conducted under the supervision of our registered legal representative in compliance with Sri Lankan property law.
+          </p>
+        </CardContent>
+      </Card>
+
+      {/* Inquiry Form - Commented out for demo */}
+      {/*
       <Card>
         <CardHeader>
           <CardTitle className="text-lg">Send Inquiry</CardTitle>
@@ -144,6 +184,7 @@ export function ContactPanel({ property }: ContactPanelProps) {
           </form>
         </CardContent>
       </Card>
+      */}
     </div>
   );
 }

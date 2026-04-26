@@ -75,10 +75,10 @@ export function PropertyHeader({ property }: PropertyHeaderProps) {
 
       {/* Actions */}
       <div className="mt-4 flex gap-2">
-        <Button variant="outline" size="sm" onClick={handleSave}>
+        {/* <Button variant="outline" size="sm" onClick={handleSave}>
           <Heart className={cn("mr-2 h-4 w-4", isSaved && "fill-red-500 text-red-500")} />
           {isSaved ? 'Saved' : 'Save'}
-        </Button>
+        </Button> */}
         <Button variant="outline" size="sm" onClick={handleShare}>
           <Share2 className="mr-2 h-4 w-4" />
           Share

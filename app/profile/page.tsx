@@ -31,7 +31,7 @@ export default async function ProfilePage() {
     getSavedProperties(user.id),
     supabase
       .from('inquiries')
-      .select('id,property_id,name,email,phone,country,message,inquiry_type,status,admin_notes,created_at')
+      .select('id,property_id,name,email,phone,country,message,inquiry_type,status,admin_notes,created_at,properties(title,slug)')
       .eq('user_id', user.id)
       .is('deleted_at', null)
       .order('created_at', { ascending: false })
@@ -40,8 +40,8 @@ export default async function ProfilePage() {
   const mappedInquiries = (inquiries || []).map((iq: any) => ({
     id: iq.id,
     propertyId: iq.property_id,
-    propertyTitle: '',
-    propertySlug: '',
+    propertyTitle: iq.properties?.title || 'Unknown Property',
+    propertySlug: iq.properties?.slug || '',
     type: iq.inquiry_type === 'site_visit' ? 'site_visit' : 'general',
     name: iq.name,
     email: iq.email,

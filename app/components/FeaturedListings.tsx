@@ -5,43 +5,10 @@ import { ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PropertyCard } from '@/components/PropertyCard';
 import type { PropertyCard as TCard } from '../../types/property'
-import type { Property as ClientProperty } from '@/lib/types'
 
 interface FeaturedListingsProps {
   featuredProperties: TCard[];
   exchangeRates?: { usd_rate: number; eur_rate: number } | null;
-}
-
-function mapCardToClientProperty(card: TCard): ClientProperty {
-  return {
-    id: card.id,
-    slug: card.slug,
-    title: card.title,
-    description: '',
-    propertyType: card.property_type,
-    listingType: card.listing_type,
-    status: card.status as any,
-    featured: false,
-    price: card.price_lkr,
-    pricePeriod: card.price_period ?? undefined,
-    landArea: card.land_area_perches ?? undefined,
-    landAreaUnit: 'perches',
-    floorArea: undefined,
-    bedrooms: card.bedrooms ?? undefined,
-    bathrooms: card.bathrooms ?? undefined,
-    district: card.district,
-    city: card.city,
-    address: undefined,
-    latitude: undefined,
-    longitude: undefined,
-    images: card.cover_image ? [{ id: `${card.id}-cover`, url: card.cover_image, alt: card.cover_alt ?? '', isCover: true }] : [],
-    documents: [],
-    facts: [],
-    nearbyAttractions: [],
-  views: 0,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  }
 }
 
 export function FeaturedListings({ featuredProperties = [], exchangeRates }: FeaturedListingsProps) {
@@ -69,7 +36,7 @@ export function FeaturedListings({ featuredProperties = [], exchangeRates }: Fea
 
         <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {list.slice(0, 6).map((property) => (
-            <PropertyCard key={property.id} property={mapCardToClientProperty(property)} />
+            <PropertyCard key={property.id} property={property} />
           ))}
         </div>
       </div>

@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { Phone, Mail, MessageCircle } from 'lucide-react';
 
 const footerLinks = [
@@ -16,10 +17,14 @@ export function Footer() {
           {/* Brand */}
           <div className="space-y-4">
             <Link href="/" className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary">
-                <span className="text-lg font-bold text-primary-foreground">K</span>
-              </div>
-              <span className="text-xl font-semibold tracking-tight">Key Motion</span>
+              <Image
+                src="/images/logokey.svg"
+                alt="Key Motion Real Estate"
+                width={140}
+                height={40}
+                className="h-10 w-auto  rounded p-0.5"
+              />
+              <span className="text-xl font-semibold tracking-tight">Key Motion Real Estate</span>
             </Link>
             <p className="text-sm text-muted-foreground leading-relaxed">
               Your trusted partner for finding the perfect property in Sri Lanka. 

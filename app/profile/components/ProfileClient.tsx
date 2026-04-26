@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { PropertyCard } from '@/components/PropertyCard';
 import { useAuth } from '@/lib/auth-context';
-import { mockProperties, mockInquiries } from '@/lib/mock-data';
+
 
 const statusColors: Record<string, string> = {
   new: 'bg-blue-100 text-blue-800',
@@ -33,8 +33,8 @@ export function ProfileClient({ initialSaved, initialInquiries }: ProfileClientP
       </div>
     );
   }
-  const savedProperties = initialSaved && initialSaved.length > 0 ? initialSaved : mockProperties.filter(p => user.savedProperties.includes(p.id));
-  const userInquiries = initialInquiries && initialInquiries.length > 0 ? initialInquiries : mockInquiries; // In a real app, filter by user
+  const savedProperties = initialSaved || [];
+  const userInquiries = initialInquiries || [];
 
   return (
     <div className="container py-8">

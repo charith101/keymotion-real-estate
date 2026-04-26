@@ -1,6 +1,7 @@
 "use client";
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Menu, X, Heart, User, LogOut, LayoutDashboard, Settings, ChevronRight, Home, Info, Phone } from 'lucide-react';
@@ -28,10 +29,15 @@ export function Navbar() {
       <div className="w-full flex h-16 items-center justify-between px-6">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary">
-            <span className="text-lg font-bold text-primary-foreground">K</span>
-          </div>
-          <span className="text-xl font-semibold tracking-tight">Key Motion</span>
+          <Image
+            src="/images/logokey.svg"
+            alt="Key Motion Real Estate"
+            width={140}
+            height={40}
+            className="h-10 w-auto  rounded p-0.5"
+            priority
+          />
+          <span className="text-xl font-semibold tracking-tight">Key Motion Real Estate</span>
         </Link>
 
         {/* Desktop Navigation */}
@@ -53,7 +59,7 @@ export function Navbar() {
         <div className="hidden items-center gap-4 md:flex">
           {isAuthenticated ? (
             <>
-              <Link href="/profile">
+              {/* <Link href="/profile">
                 <Button variant="ghost" size="icon" className="relative">
                   <Heart className="h-5 w-5" />
                   {user && user.savedProperties.length > 0 && (
@@ -63,7 +69,7 @@ export function Navbar() {
                   )}
                   <span className="sr-only">Saved properties</span>
                 </Button>
-              </Link>
+              </Link> */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-8 w-8 rounded-full">
@@ -132,7 +138,14 @@ export function Navbar() {
             {/* Header */}
             <div className="border-b border-border/40 px-6 py-5">
               <div className="flex items-center gap-2">
-                <span className="text-lg font-semibold tracking-tight">Key Motion</span>
+                <Image
+                  src="/images/logokey.svg"
+                  alt="Key Motion Real Estate"
+                  width={120}
+                  height={36}
+                  className="h-9 w-auto  rounded p-0.5"
+                />
+                <span className="text-lg font-semibold tracking-tight">Key Motion Real Estate</span>
               </div>
             </div>
 

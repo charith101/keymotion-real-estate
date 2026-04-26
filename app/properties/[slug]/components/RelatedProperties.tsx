@@ -1,10 +1,10 @@
 "use client";
 
 import { PropertyCard } from '@/components/PropertyCard';
-import type { Property } from '@/lib/types';
+import type { PropertyCard as TCard } from '@/types/property';
 
 interface RelatedPropertiesProps {
-  properties: Property[];
+  properties: TCard[];
 }
 
 export function RelatedProperties({ properties }: RelatedPropertiesProps) {

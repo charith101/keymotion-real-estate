@@ -8,11 +8,12 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/lib/auth-context';
 import { useCurrency } from '@/lib/currency-context';
-import type { Property } from '@/lib/types';
+// Import the PropertyCard type from your shared types
+import type { PropertyCard as PropertyCardType } from '@/types/property'; 
 import { cn } from '@/lib/utils';
 
 interface PropertyCardProps {
-  property: Property;
+  property: PropertyCardType;
   className?: string;
 }
 
@@ -28,7 +29,6 @@ export function PropertyCard({ property, className }: PropertyCardProps) {
   const { isAuthenticated, toggleSaveProperty, isPropertySaved } = useAuth();
   const { formatPrice } = useCurrency();
   
-  const coverImage = property.images.find(img => img.isCover) || property.images[0];
   const isSaved = isPropertySaved(property.id);
 
   const handleSaveClick = (e: React.MouseEvent) => {
@@ -41,11 +41,11 @@ export function PropertyCard({ property, className }: PropertyCardProps) {
     <Card className={cn("group overflow-hidden transition-shadow hover:shadow-lg", className)}>
       <Link href={`/properties/${property.slug}`}>
         {/* Image Container */}
-        <div className="relative aspect-[4/3] overflow-hidden -mt-6">
-          {coverImage && (
+        <div className="relative aspect-[4/3] overflow-hidden -mt-6 bg-muted">
+          {property.cover_image && (
             <Image
-              src={coverImage.url}
-              alt={coverImage.alt}
+              src={property.cover_image}
+              alt={property.cover_alt || property.title}
               fill
               className="object-cover transition-transform duration-300 group-hover:scale-105"
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -54,16 +54,16 @@ export function PropertyCard({ property, className }: PropertyCardProps) {
           
           {/* Badges */}
           <div className="absolute left-3 top-3 flex flex-wrap gap-2">
-            <Badge variant={property.listingType === 'sale' ? 'default' : 'secondary'}>
-              For {property.listingType === 'sale' ? 'Sale' : property.listingType === 'rent' ? 'Rent' : 'Lease'}
+            <Badge variant={property.listing_type === 'sale' ? 'default' : 'secondary'}>
+              For {property.listing_type === 'sale' ? 'Sale' : property.listing_type === 'rent' ? 'Rent' : 'Lease'}
             </Badge>
             <Badge variant="outline" className="bg-background/80 backdrop-blur-sm">
-              {propertyTypeLabels[property.propertyType]}
+              {propertyTypeLabels[property.property_type]}
             </Badge>
           </div>
 
           {/* Save Button */}
-          {isAuthenticated && (
+          {/* {isAuthenticated && (
             <Button
               variant="ghost"
               size="icon"
@@ -73,7 +73,7 @@ export function PropertyCard({ property, className }: PropertyCardProps) {
             >
               <Heart className={cn("h-4 w-4", isSaved && "fill-red-500 text-red-500")} />
             </Button>
-          )}
+          )} */}
         </div>
 
         <CardContent className="p-4">
@@ -90,22 +90,22 @@ export function PropertyCard({ property, className }: PropertyCardProps) {
 
           {/* Stats */}
           <div className="mt-3 flex flex-wrap gap-3 text-sm text-muted-foreground">
-            {property.bedrooms !== undefined && (
+            {property.property_type !== 'land' && property.bedrooms !== null && property.bedrooms !== undefined && (
               <div className="flex items-center gap-1">
                 <Bed className="h-4 w-4" />
                 <span>{property.bedrooms} Beds</span>
               </div>
             )}
-            {property.bathrooms !== undefined && (
+            {property.property_type !== 'land' && property.bathrooms !== null && property.bathrooms !== undefined && (
               <div className="flex items-center gap-1">
                 <Bath className="h-4 w-4" />
                 <span>{property.bathrooms} Baths</span>
               </div>
             )}
-            {property.landArea !== undefined && (
+            {property.land_area_perches !== null && property.land_area_perches !== undefined && (
               <div className="flex items-center gap-1">
                 <Maximize className="h-4 w-4" />
-                <span>{property.landArea} {property.landAreaUnit}</span>
+                <span>{property.land_area_perches} Perches</span>
               </div>
             )}
           </div>
@@ -113,10 +113,10 @@ export function PropertyCard({ property, className }: PropertyCardProps) {
           {/* Price */}
           <div className="mt-4 flex items-baseline justify-between">
             <p className="text-lg font-bold text-primary">
-              {formatPrice(property.price)}
-              {property.pricePeriod && (
+              {formatPrice(property.price_lkr)}
+              {property.price_period && (
                 <span className="text-sm font-normal text-muted-foreground">
-                  /{property.pricePeriod === 'monthly' ? 'mo' : 'yr'}
+                  /{property.price_period === 'monthly' ? 'mo' : 'yr'}
                 </span>
               )}
             </p>

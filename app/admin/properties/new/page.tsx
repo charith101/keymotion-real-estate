@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { ArrowLeft, Plus, X, GripVertical, Upload, Star, Trash2, Image as ImageIcon } from 'lucide-react';
+import { ArrowLeft, Plus, X, GripVertical, Upload, Star, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -24,6 +24,8 @@ import {
 import { districts } from '@/lib/constants/districts';
 import { toast } from 'sonner';
 
+const optionalNumber = z.union([z.coerce.number(), z.literal('')]).transform(v => v === '' ? undefined : v).optional();
+
 const propertySchema = z.object({
   title: z.string().min(5, 'Title must be at least 5 characters'),
   description: z.string().min(20, 'Description must be at least 20 characters'),
@@ -31,19 +33,19 @@ const propertySchema = z.object({
   listingType: z.enum(['sale', 'rent', 'lease']),
   status: z.enum(['active', 'draft']),
   featured: z.boolean(),
-  price: z.number().min(1, 'Price is required'),
-  pricePeriod: z.enum(['monthly', 'yearly']).optional(),
+  price: z.coerce.number().min(1, 'Price is required'),
+  pricePeriod: z.enum(['monthly', 'yearly', '']).optional().transform(v => v === '' ? undefined : v),
   lawyerId: z.string().optional(),
-  landArea: z.number().optional(),
-  landAreaUnit: z.enum(['perches', 'acres']).optional(),
-  floorArea: z.number().optional(),
-  bedrooms: z.number().optional(),
-  bathrooms: z.number().optional(),
+  landArea: optionalNumber,
+  landAreaUnit: z.enum(['perches', 'acres', '']).optional().transform(v => v === '' ? undefined : v),
+  floorArea: optionalNumber,
+  bedrooms: optionalNumber,
+  bathrooms: optionalNumber,
   district: z.string().min(1, 'District is required'),
   city: z.string().min(1, 'City is required'),
   address: z.string().optional(),
-  latitude: z.number().optional(),
-  longitude: z.number().optional(),
+  latitude: optionalNumber,
+  longitude: optionalNumber,
 });
 
 type PropertyFormData = z.infer<typeof propertySchema>;
@@ -77,7 +79,6 @@ export default function NewPropertyPage() {
   const [attractions, setAttractions] = useState<NearbyAttraction[]>([]);
   const [images, setImages] = useState<ImagePreview[]>([]);
   const [lawyers, setLawyers] = useState<any[]>([]);
-  const [draggedImageId, setDraggedImageId] = useState<string | null>(null);
 
   const {
     register,
@@ -107,23 +108,19 @@ export default function NewPropertyPage() {
         const r = await fetch('/api/admin/lawyers', { credentials: 'same-origin' });
         const j = await r.json();
         if (!cancelled && r.ok) setLawyers(j.data || []);
-      } catch {
-        // noop
-      }
+      } catch {}
     })();
     return () => {
       cancelled = true;
     };
   }, []);
 
-  // Determine which fields to show based on property type
   const shouldShowBedrooms = propertyType !== 'land' && propertyType !== 'commercial';
   const shouldShowBathrooms = propertyType !== 'land' && propertyType !== 'commercial';
   const shouldShowFloorArea = propertyType !== 'land';
   const shouldShowLandArea = propertyType === 'land' || propertyType === 'agricultural';
 
   const onSubmit = async (data: PropertyFormData) => {
-    // Validate that at least one image is selected
     if (images.length === 0) {
       toast.error('Please add at least one image');
       return;
@@ -193,7 +190,6 @@ export default function NewPropertyPage() {
 
       const created = json.data;
 
-      // Upload images
       if (images.length > 0 && created?.id) {
         const form = new FormData();
         images.forEach((img) => {
@@ -227,11 +223,11 @@ export default function NewPropertyPage() {
 
   const handleAddImages = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    const newImages: ImagePreview[] = files.map((file) => ({
+    const newImages: ImagePreview[] = files.map((file, index) => ({
       id: (Date.now() + Math.random()).toString(),
       file,
       preview: URL.createObjectURL(file),
-      isCover: images.length === 0, // First image is cover by default
+      isCover: images.length === 0 && index === 0,
     }));
     setImages([...images, ...newImages]);
   };
@@ -240,7 +236,6 @@ export default function NewPropertyPage() {
     const image = images.find((img) => img.id === id);
     if (image) URL.revokeObjectURL(image.preview);
     const remaining = images.filter((img) => img.id !== id);
-    // If removed image was cover, set first remaining as cover
     if (images.find((img) => img.id === id)?.isCover && remaining.length > 0) {
       remaining[0].isCover = true;
     }
@@ -303,8 +298,7 @@ export default function NewPropertyPage() {
         </div>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        {/* Basic Information */}
+      <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
         <Card>
           <CardHeader>
             <CardTitle>Basic Information</CardTitle>
@@ -374,8 +368,8 @@ export default function NewPropertyPage() {
                     <SelectItem value="none">None</SelectItem>
                     {lawyers.map((l) => (
                       <SelectItem key={l.id} value={l.id}>
-                        {l.name}
-                        {l.firm ? ` — ${l.firm}` : ''}
+                        {l.full_name}
+                        {l.firm ? ` — ${l.firm_name}` : ''}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -410,7 +404,6 @@ export default function NewPropertyPage() {
           </CardContent>
         </Card>
 
-        {/* Pricing */}
         <Card>
           <CardHeader>
             <CardTitle>Pricing</CardTitle>
@@ -422,7 +415,7 @@ export default function NewPropertyPage() {
                 <Input
                   id="price"
                   type="number"
-                  {...register('price', { valueAsNumber: true })}
+                  {...register('price')}
                   placeholder="0"
                   className="mt-1.5"
                 />
@@ -450,7 +443,6 @@ export default function NewPropertyPage() {
           </CardContent>
         </Card>
 
-        {/* Property Details */}
         <Card>
           <CardHeader>
             <CardTitle>Property Details</CardTitle>
@@ -463,7 +455,7 @@ export default function NewPropertyPage() {
                   <Input
                     type="number"
                     step="0.01"
-                    {...register('landArea', { valueAsNumber: true })}
+                    {...register('landArea')}
                     placeholder="Area"
                   />
                   <Select value={watch('landAreaUnit') || 'perches'} onValueChange={(v) => setValue('landAreaUnit', v as any)}>
@@ -486,7 +478,7 @@ export default function NewPropertyPage() {
                   id="floorArea"
                   type="number"
                   step="0.01"
-                  {...register('floorArea', { valueAsNumber: true })}
+                  {...register('floorArea')}
                   placeholder="Floor area in sqft"
                   className="mt-1.5"
                 />
@@ -499,7 +491,7 @@ export default function NewPropertyPage() {
                 <Input
                   id="bedrooms"
                   type="number"
-                  {...register('bedrooms', { valueAsNumber: true })}
+                  {...register('bedrooms')}
                   placeholder="Number of bedrooms"
                   className="mt-1.5"
                 />
@@ -512,7 +504,7 @@ export default function NewPropertyPage() {
                 <Input
                   id="bathrooms"
                   type="number"
-                  {...register('bathrooms', { valueAsNumber: true })}
+                  {...register('bathrooms')}
                   placeholder="Number of bathrooms"
                   className="mt-1.5"
                 />
@@ -521,7 +513,6 @@ export default function NewPropertyPage() {
           </CardContent>
         </Card>
 
-        {/* Location */}
         <Card>
           <CardHeader>
             <CardTitle>Location</CardTitle>
@@ -566,7 +557,7 @@ export default function NewPropertyPage() {
                   id="latitude"
                   type="number"
                   step="any"
-                  {...register('latitude', { valueAsNumber: true })}
+                  {...register('latitude')}
                   placeholder="Latitude"
                   className="mt-1.5"
                 />
@@ -577,7 +568,7 @@ export default function NewPropertyPage() {
                   id="longitude"
                   type="number"
                   step="any"
-                  {...register('longitude', { valueAsNumber: true })}
+                  {...register('longitude')}
                   placeholder="Longitude"
                   className="mt-1.5"
                 />
@@ -586,7 +577,6 @@ export default function NewPropertyPage() {
           </CardContent>
         </Card>
 
-        {/* Images */}
         <Card>
           <CardHeader>
             <CardTitle>Images</CardTitle>
@@ -685,7 +675,6 @@ export default function NewPropertyPage() {
           </CardContent>
         </Card>
 
-        {/* Property Facts */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle>Property Facts</CardTitle>
@@ -731,7 +720,6 @@ export default function NewPropertyPage() {
           </CardContent>
         </Card>
 
-        {/* Nearby Attractions */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle>Nearby Attractions</CardTitle>
@@ -796,7 +784,6 @@ export default function NewPropertyPage() {
           </CardContent>
         </Card>
 
-        {/* Actions */}
         <div className="flex justify-end gap-4">
           <Button type="button" variant="outline" onClick={() => router.back()}>
             Cancel
@@ -804,14 +791,16 @@ export default function NewPropertyPage() {
           <Button
             type="submit"
             variant="secondary"
-            onClick={() => {
-              setValue('status', 'draft');
-              setTimeout(() => handleSubmit(onSubmit)(), 0);
-            }}
+            onClick={() => setValue('status', 'draft')}
+            disabled={isSubmitting}
           >
             Save as Draft
           </Button>
-          <Button type="submit" disabled={isSubmitting}>
+          <Button
+            type="submit"
+            onClick={() => setValue('status', 'active')}
+            disabled={isSubmitting}
+          >
             {isSubmitting ? 'Publishing...' : 'Publish'}
           </Button>
         </div>

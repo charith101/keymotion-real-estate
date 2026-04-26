@@ -217,6 +217,8 @@ export default async function PropertyDetailPage({ params }: {params: Promise<{ 
                 latitude={clientProperty.latitude} 
                 longitude={clientProperty.longitude} 
                 title={clientProperty.title}
+                address={clientProperty.address}
+                city={clientProperty.city}
               />
             </div>
 

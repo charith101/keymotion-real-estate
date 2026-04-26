@@ -140,7 +140,16 @@ export async function getProperties(filters: PropertyFilters): Promise<{ propert
       query = query.textSearch('search_vector', filters.search, { type: 'websearch' })
     }
 
-    if (filters.type) query = query.eq('property_type', filters.type)
+    // Support comma-separated property types (e.g. "house,land,apartment")
+    if (filters.type) {
+      const types = filters.type.split(',').map(t => t.trim()).filter(Boolean)
+      if (types.length === 1) {
+        query = query.eq('property_type', types[0])
+      } else if (types.length > 1) {
+        query = query.in('property_type', types)
+      }
+    }
+
     if (filters.listing) query = query.eq('listing_type', filters.listing)
     if (filters.district) query = query.eq('district', filters.district)
 
@@ -150,6 +159,7 @@ export async function getProperties(filters: PropertyFilters): Promise<{ propert
     if (filters.min_area) query = query.gte('land_area_perches', Number(filters.min_area))
     if (filters.max_area) query = query.lte('land_area_perches', Number(filters.max_area))
 
+    // beds = minimum bedroom count (X+)
     if (filters.beds) query = query.gte('bedrooms', Number(filters.beds))
 
     // sorting
