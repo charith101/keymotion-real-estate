@@ -22,7 +22,7 @@ const navLinks = [
 export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const router = useRouter();
-  const { user, isAuthenticated, isAdmin } = useAuth();
+  const { user, isAuthenticated, isAdmin, logout } = useAuth();
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/70">
@@ -100,7 +100,7 @@ export function Navbar() {
                     </DropdownMenuItem>
                   )}
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => router.push('/auth/logout')} className="cursor-pointer">
+                  <DropdownMenuItem onClick={() => logout()} className="cursor-pointer">
                     <LogOut className="mr-2 h-4 w-4" />
                     Log out
                   </DropdownMenuItem>
@@ -226,7 +226,7 @@ export function Navbar() {
             <div className="mt-auto border-t border-border/40 p-6">
               {isAuthenticated ? (
                 <Button
-                  onClick={() => router.push('/auth/logout')}
+                  onClick={() => logout()}
                   variant="outline"
                   className="w-full justify-center gap-2 rounded-lg py-5 text-base font-medium"
                 >

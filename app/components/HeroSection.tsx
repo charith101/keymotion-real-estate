@@ -47,10 +47,11 @@ export function HeroSection({ exchangeRates }: HeroSectionProps) {
       <div className="container relative z-10">
         <div className="mx-auto max-w-3xl text-center">
           <h1 className="text-balance text-4xl font-bold tracking-tight text-foreground md:text-5xl lg:text-6xl">
-            Buy, Sell, Rent, Lease, Search In Ahangama, Midigama, Kabalana
+            Find Your Perfect Property in Ahangama, Midigama & Kabalana
           </h1>
+
           <p className="mt-6 text-pretty text-lg text-muted-foreground md:text-xl">
-           For any Lands Villas, Actuve Businesses
+            Buy, sell, rent, or lease lands, luxury villas, and thriving businesses with ease.
           </p>
 
           {/* Search Form */}

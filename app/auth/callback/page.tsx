@@ -9,40 +9,21 @@ export default function AuthCallbackPage() {
   const [status, setStatus] = useState<'loading' | 'done' | 'error'>('loading')
 
   useEffect(() => {
-    // After the provider redirects back, ensure Supabase has processed the session on the
-    // browser client, then POST the tokens to a server route which will set httpOnly
-    // Supabase cookies so SSR can read the session.
-    const supabase = createClient()
-
     let mounted = true
 
     async function finalize() {
       try {
+        const supabase = createClient()
         // Attempt to read the session from the client-side Supabase instance
         const { data } = await supabase.auth.getSession()
         const session = data?.session
 
         if (!mounted) return
 
-        if (session && session.access_token && session.refresh_token) {
-          // Post tokens to the server route which will set httpOnly cookies
-          const resp = await fetch('/api/auth/set', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              access_token: session.access_token,
-              refresh_token: session.refresh_token,
-            }),
-          })
-
-          if (!resp.ok) {
-            setStatus('error')
-            router.replace('/login')
-            return
-          }
-
+        if (session) {
           setStatus('done')
           router.replace('/')
+          router.refresh()
         } else {
           // If no session, go to login to show an error state
           setStatus('error')

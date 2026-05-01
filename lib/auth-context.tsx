@@ -8,6 +8,7 @@ import {
   useEffect,
   type ReactNode,
 } from "react";
+import { useRouter } from "next/navigation";
 import type { Session } from "@supabase/supabase-js";
 import type { User as AppUser } from "./types";
 import { createClient } from "./supabase/client";
@@ -56,6 +57,7 @@ interface AuthProviderProps {
 }
 
 export function AuthProvider({ children, initialSession }: AuthProviderProps) {
+  const router = useRouter();
   const [user, setUser] = useState<AppUser | null>(
     initialSession?.user
       ? mapSupabaseUser(initialSession.user, initialSession.access_token)
@@ -82,8 +84,11 @@ export function AuthProvider({ children, initialSession }: AuthProviderProps) {
     const supabase = createClient();
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) throw error;
-    if (data.user) setUser(mapSupabaseUser(data.user, data.session?.access_token));
-  }, []);
+    if (data.user) {
+      setUser(mapSupabaseUser(data.user, data.session?.access_token));
+      router.refresh();
+    }
+  }, [router]);
 
   const loginWithGoogle = useCallback(async () => {
     const supabase = createClient();
@@ -101,14 +106,19 @@ export function AuthProvider({ children, initialSession }: AuthProviderProps) {
       options: { data: { name } },
     });
     if (error) throw error;
-    if (data.user) setUser(mapSupabaseUser(data.user, data.session?.access_token));
-  }, []);
+    if (data.user) {
+      setUser(mapSupabaseUser(data.user, data.session?.access_token));
+      router.refresh();
+    }
+  }, [router]);
 
   const logout = useCallback(async () => {
     const supabase = createClient();
     await supabase.auth.signOut();
     setUser(null);
-  }, []);
+    router.refresh();
+    router.push('/login');
+  }, [router]);
 
   const toggleSaveProperty = useCallback((propertyId: string) => {
     setUser((prev) => {

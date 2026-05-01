@@ -25,45 +25,47 @@ export async function updateSession(request: NextRequest) {
     }
   )
 
-  // Refresh session — do not remove this call.
-  // It keeps the session alive and syncs auth state.
+  // Get session for the JWT payload
   const { data: { session } } = await supabase.auth.getSession()
-  const user = session?.user
+  
+  // Get user for secure server-side verification
+  const { data: { user } } = await supabase.auth.getUser()
 
   let role = null
-  if (session?.access_token) {
-   const payload = JSON.parse(atob(session.access_token.split('.')[1]))
-   role = payload.user_role
+  if (session?.access_token && user) {
+    try {
+      const payload = JSON.parse(atob(session.access_token.split('.')[1]))
+      role = payload.user_role
+    } catch (e) {
+      // Ignore parsing errors
+    }
   }
 
-  // --- Route protection ---
+  const path = request.nextUrl.pathname
 
-  // Admin routes: must be logged in AND have admin role in JWT
-  if (request.nextUrl.pathname.startsWith('/admin')) {
-  if (!user) {
-    return NextResponse.redirect(new URL('/login', request.url))
+  // Admin routes: must be logged in AND have admin role
+  if (path.startsWith('/admin')) {
+    if (!user) {
+      return NextResponse.redirect(new URL('/login', request.url))
+    }
+    if (role !== 'admin') {
+      return NextResponse.redirect(new URL('/', request.url))
+    }
   }
-  if (role !== 'admin') {
-    return NextResponse.redirect(new URL('/', request.url))
-  }
-}
 
-// Profile routes
-if (request.nextUrl.pathname.startsWith('/profile')) {
-  if (!user) {
-    return NextResponse.redirect(new URL('/login', request.url))
+  // Profile routes: must be logged in
+  if (path.startsWith('/profile')) {
+    if (!user) {
+      return NextResponse.redirect(new URL('/login', request.url))
+    }
   }
-}
 
-// Auth pages
-if (
-  request.nextUrl.pathname === '/login' ||
-  request.nextUrl.pathname === '/register'
-) {
-  if (user) {
-    return NextResponse.redirect(new URL('/', request.url))
+  // Auth pages: must NOT be logged in
+  if (path === '/login' || path === '/register') {
+    if (user) {
+      return NextResponse.redirect(new URL('/', request.url))
+    }
   }
-}
 
   return supabaseResponse
 }
