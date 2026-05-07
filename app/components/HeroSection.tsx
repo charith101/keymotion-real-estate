@@ -45,9 +45,14 @@ export function HeroSection({ exchangeRates }: HeroSectionProps) {
       />
       
       <div className="container relative z-10">
-        <div className="mx-auto max-w-3xl text-center">
-          <h1 className="text-balance text-4xl font-bold tracking-tight text-foreground md:text-5xl lg:text-6xl">
-            Find Your Perfect Property in Ahangama, Midigama & Kabalana
+        <div className="mx-auto max-w-5xl text-center">
+          <h1 className="text-4xl font-bold tracking-tight text-foreground md:text-6xl lg:text-7xl leading-tight">
+            <span className="block">
+              Find Your Perfect Property in
+            </span>
+            <span className="block text-2xl md:text-3xl lg:text-4xl text-gray-500 dark:text-gray-500">
+              Ahangama, Midigama & Kabalana
+            </span>
           </h1>
 
           <p className="mt-6 text-pretty text-lg text-muted-foreground md:text-xl">

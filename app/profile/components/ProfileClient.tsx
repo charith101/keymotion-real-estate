@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Heart, MessageSquare, Calendar, ExternalLink } from 'lucide-react';
@@ -8,8 +8,10 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { PropertyCard } from '@/components/PropertyCard';
 import { useAuth } from '@/lib/auth-context';
+import { ProfilePropertyCard } from './ProfilePropertyCard';
+import { unsaveProperty } from '@/lib/actions/saved';
+import { toast } from 'sonner';
 
 
 const statusColors: Record<string, string> = {
@@ -33,8 +35,20 @@ export function ProfileClient({ initialSaved, initialInquiries }: ProfileClientP
       </div>
     );
   }
-  const savedProperties = initialSaved || [];
+  const [savedProperties, setSavedProperties] = useState<any[]>(initialSaved || []);
   const userInquiries = initialInquiries || [];
+
+  const handleRemoveSaved = async (propertyId: string) => {
+    // optimistic update
+    setSavedProperties(prev => prev.filter(p => p.id !== propertyId));
+    const res = await unsaveProperty(propertyId);
+    if (res.error) {
+      toast.error(res.error);
+      // We don't have the original property to put it back easily, but a router refresh could fix it
+    } else {
+      toast.success('Property removed from saved');
+    }
+  };
 
   return (
     <div className="container py-8">
@@ -76,9 +90,13 @@ export function ProfileClient({ initialSaved, initialInquiries }: ProfileClientP
         {/* Saved Properties Tab */}
         <TabsContent value="saved" className="mt-6">
           {savedProperties.length > 0 ? (
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-6 grid-cols-1 md:grid-cols-2">
               {savedProperties.map((property) => (
-                <PropertyCard key={property.id} property={property} />
+                <ProfilePropertyCard 
+                  key={property.id} 
+                  property={property} 
+                  onRemove={handleRemoveSaved} 
+                />
               ))}
             </div>
           ) : (

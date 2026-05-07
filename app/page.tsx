@@ -11,10 +11,10 @@ import { CTABanner } from './components/CTABanner';
 
 export const metadata: Metadata = {
   title: 'Key Motion Real Estate',
-  description: 'Your trusted partner for finding the perfect property in Sri Lanka. Browse land, houses, apartments, and commercial properties for sale, rent, or lease worldwide.',
+  description: 'Your trusted partner for finding the perfect property in Ahangama, Midigama And Kabalana Sri Lanka. Buy, sell, rent, or lease lands, luxury villas, and thriving businesses with ease.',
   openGraph: {
-    title: 'Key Motion Real Estate | Find Your Dream Property in Sri Lanka',
-    description: 'Your trusted partner for finding the perfect property in Sri Lanka. Browse land, houses, apartments, and commercial properties for sale, rent, or lease worldwide.',
+    title: 'Key Motion Real Estate | Find Your Dream Property in Ahangama, Midigama And Kabalana Sri Lanka',
+    description: 'Your trusted partner for finding the perfect property in Ahangama, Midigama And Kabalana Sri Lanka. Buy, sell, rent, or lease lands, luxury villas, and thriving businesses with ease.',
     type: 'website',
   },
 };

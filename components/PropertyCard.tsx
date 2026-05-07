@@ -6,7 +6,6 @@ import { Heart, Bed, Bath, Maximize, MapPin } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { useAuth } from '@/lib/auth-context';
 import { useCurrency } from '@/lib/currency-context';
 // Import the PropertyCard type from your shared types
 import type { PropertyCard as PropertyCardType } from '@/types/property'; 
@@ -26,16 +25,7 @@ const propertyTypeLabels: Record<string, string> = {
 };
 
 export function PropertyCard({ property, className }: PropertyCardProps) {
-  const { isAuthenticated, toggleSaveProperty, isPropertySaved } = useAuth();
   const { formatPrice } = useCurrency();
-  
-  const isSaved = isPropertySaved(property.id);
-
-  const handleSaveClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    toggleSaveProperty(property.id);
-  };
 
   return (
     <Card className={cn("group overflow-hidden transition-shadow hover:shadow-lg", className)}>
@@ -62,18 +52,6 @@ export function PropertyCard({ property, className }: PropertyCardProps) {
             </Badge>
           </div>
 
-          {/* Save Button */}
-          {/* {isAuthenticated && (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="absolute right-3 top-3 h-8 w-8 rounded-full bg-background/80 backdrop-blur-sm hover:bg-background"
-              onClick={handleSaveClick}
-              aria-label={isSaved ? "Remove from saved" : "Save property"}
-            >
-              <Heart className={cn("h-4 w-4", isSaved && "fill-red-500 text-red-500")} />
-            </Button>
-          )} */}
         </div>
 
         <CardContent className="p-4">

@@ -54,6 +54,16 @@ export interface Property {
   address?: string;
   latitude?: number;
   longitude?: number;
+  link?: string;
+  lawyers?: {
+    id: string;
+    full_name: string;
+    firm_name: string | null;
+    phone: string | null;
+    email: string | null;
+    address: string | null;
+    active: boolean;
+  } | null;
   images: PropertyImage[];
   documents: PropertyDocument[];
   facts: PropertyFact[];
@@ -70,7 +80,6 @@ export interface User {
   email: string;
   avatar?: string;
   role: 'user' | 'admin';
-  savedProperties: string[];
   phone?: string;
   createdAt?: string;
 }

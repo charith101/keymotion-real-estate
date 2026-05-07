@@ -6,7 +6,7 @@ import { Phone, MessageCircle, Mail, MapPin, Clock } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Contact Us',
-  description: 'Get in touch with Key Motion Real Estate. Contact us for property inquiries, site visits, or any questions about real estate in Sri Lanka.',
+  description: 'Get in touch with Key Motion Real Estate. Contact us for property inquiries, site visits, or any questions about real estate in Ahangama, Midigama And Kabalana Sri Lanka.',
   openGraph: {
     title: 'Contact Us | Key Motion Real Estate',
     description: 'Get in touch with Key Motion Real Estate for property inquiries and real estate services.',

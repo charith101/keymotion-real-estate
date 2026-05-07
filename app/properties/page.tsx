@@ -6,10 +6,10 @@ import { getProperties } from '@/lib/queries/properties'
 
 export const metadata: Metadata = {
   title: 'Properties | Browse All Listings',
-  description: 'Browse our extensive collection of properties in Sri Lanka. Find land, houses, apartments, and commercial properties for sale, rent, or lease.',
+  description: 'Browse our extensive collection of properties in Ahangama, Midigama And Kabalana Sri Lanka. Find land, houses, apartments, and commercial properties for sale, rent, or lease.',
   openGraph: {
     title: 'Properties | Key Motion Real Estate',
-    description: 'Browse our extensive collection of properties in Sri Lanka. Find land, houses, apartments, and commercial properties for sale, rent, or lease.',
+    description: 'Browse our extensive collection of properties in Ahangama, Midigama And Kabalana Sri Lanka. Find land, houses, apartments, and commercial properties for sale, rent, or lease.',
     type: 'website',
   },
 };

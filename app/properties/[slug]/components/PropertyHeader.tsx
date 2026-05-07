@@ -7,9 +7,12 @@ import { useAuth } from '@/lib/auth-context';
 import type { Property } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { useState } from 'react';
+import { saveProperty, unsaveProperty } from '@/lib/actions/saved';
 
 interface PropertyHeaderProps {
   property: Property;
+  initialIsSaved?: boolean;
 }
 
 const propertyTypeLabels: Record<string, string> = {
@@ -20,9 +23,9 @@ const propertyTypeLabels: Record<string, string> = {
   agricultural: 'Agricultural',
 };
 
-export function PropertyHeader({ property }: PropertyHeaderProps) {
-  const { isAuthenticated, toggleSaveProperty, isPropertySaved } = useAuth();
-  const isSaved = isPropertySaved(property.id);
+export function PropertyHeader({ property, initialIsSaved = false }: PropertyHeaderProps) {
+  const { isAuthenticated } = useAuth();
+  const [isSaved, setIsSaved] = useState(initialIsSaved);
 
   const handleShare = async () => {
     const url = window.location.href;
@@ -41,13 +44,32 @@ export function PropertyHeader({ property }: PropertyHeaderProps) {
     }
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!isAuthenticated) {
       toast.error('Please login to save properties');
       return;
     }
-    toggleSaveProperty(property.id);
-    toast.success(isSaved ? 'Removed from saved' : 'Added to saved');
+    
+    // optimistic update
+    setIsSaved(!isSaved);
+    
+    if (isSaved) {
+      const res = await unsaveProperty(property.id);
+      if (res.error) {
+        setIsSaved(true);
+        toast.error(res.error);
+      } else {
+        toast.success('Removed from saved');
+      }
+    } else {
+      const res = await saveProperty(property.id);
+      if (res.error) {
+        setIsSaved(false);
+        toast.error(res.error);
+      } else {
+        toast.success('Added to saved');
+      }
+    }
   };
 
   return (
@@ -75,10 +97,12 @@ export function PropertyHeader({ property }: PropertyHeaderProps) {
 
       {/* Actions */}
       <div className="mt-4 flex gap-2">
-        {/* <Button variant="outline" size="sm" onClick={handleSave}>
-          <Heart className={cn("mr-2 h-4 w-4", isSaved && "fill-red-500 text-red-500")} />
-          {isSaved ? 'Saved' : 'Save'}
-        </Button> */}
+        {isAuthenticated && (
+          <Button variant="outline" size="sm" onClick={handleSave}>
+            <Heart className={cn("mr-2 h-4 w-4", isSaved && "fill-red-500 text-red-500")} />
+            {isSaved ? 'Saved' : 'Save'}
+          </Button>
+        )}
         <Button variant="outline" size="sm" onClick={handleShare}>
           <Share2 className="mr-2 h-4 w-4" />
           Share

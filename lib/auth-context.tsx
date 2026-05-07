@@ -21,8 +21,6 @@ interface AuthContextType {
   loginWithGoogle: () => Promise<void>;
   register: (name: string, email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
-  toggleSaveProperty: (propertyId: string) => void;
-  isPropertySaved: (propertyId: string) => boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -42,13 +40,7 @@ function mapSupabaseUser(u: any, accessToken?: string): AppUser {
     } catch {}
   }
 
-  let savedProperties: string[] = [];
-  try {
-    const raw = localStorage.getItem(`savedProperties:${id}`);
-    if (raw) savedProperties = JSON.parse(raw);
-  } catch {}
-
-  return { id, name, email, avatar, role, savedProperties };
+  return { id, name, email, avatar, role };
 }
 
 interface AuthProviderProps {
@@ -120,24 +112,6 @@ export function AuthProvider({ children, initialSession }: AuthProviderProps) {
     router.push('/login');
   }, [router]);
 
-  const toggleSaveProperty = useCallback((propertyId: string) => {
-    setUser((prev) => {
-      if (!prev) return prev;
-      const saved = prev.savedProperties.includes(propertyId)
-        ? prev.savedProperties.filter((id) => id !== propertyId)
-        : [...prev.savedProperties, propertyId];
-      try {
-        localStorage.setItem(`savedProperties:${prev.id}`, JSON.stringify(saved));
-      } catch {}
-      return { ...prev, savedProperties: saved };
-    });
-  }, []);
-
-  const isPropertySaved = useCallback(
-    (propertyId: string) => user?.savedProperties.includes(propertyId) ?? false,
-    [user]
-  );
-
   return (
     <AuthContext.Provider
       value={{
@@ -148,8 +122,6 @@ export function AuthProvider({ children, initialSession }: AuthProviderProps) {
         loginWithGoogle,
         register,
         logout,
-        toggleSaveProperty,
-        isPropertySaved,
       }}
     >
       {children}

@@ -92,35 +92,50 @@ export function ContactPanel({ property }: ContactPanelProps) {
       </Card>
 
       {/* Lawyer Card */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>
-            Legal Representative
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary font-bold text-lg">
-              AR
+      {property.lawyers && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>
+              Legal Representative
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary font-bold text-lg">
+                {property.lawyers.full_name?.substring(0, 2).toUpperCase() || 'L'}
+              </div>
+              <div>
+                <p className="font-semibold text-base">{property.lawyers.full_name}</p>
+                <p className="text-sm text-muted-foreground">{property.lawyers.firm_name || 'Licensed Attorney-at-Law'}</p>
+              </div>
             </div>
-            <div>
-              <p className="font-semibold text-base">Atty. Ben Jack</p>
-              <p className="text-sm text-muted-foreground">Licensed Attorney-at-Law</p>
+            
+            <div className="rounded-lg border bg-muted/50 p-3 space-y-2">
+              {property.lawyers.phone && (
+                <div className="flex items-center gap-2 text-sm">
+                  <Phone className="h-4 w-4 text-muted-foreground" />
+                  <a href={`tel:${property.lawyers.phone}`} className="font-medium hover:underline">
+                    {property.lawyers.phone}
+                  </a>
+                </div>
+              )}
+              {property.lawyers.email && (
+                <div className="flex items-center gap-2 text-sm">
+                  <MessageCircle className="h-4 w-4 text-muted-foreground" />
+                  <a href={`mailto:${property.lawyers.email}`} className="font-medium hover:underline">
+                    {property.lawyers.email}
+                  </a>
+                </div>
+              )}
             </div>
-          </div>
-          <div className="rounded-lg border bg-muted/50 p-3 space-y-2">
-            <div className="flex items-center gap-2 text-sm">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-muted-foreground"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>
-              <span className="text-muted-foreground">Legal Scheme:</span>
-            </div>
-            <p className="font-medium text-sm">Title Verification & Transfer under Notarial Act No. 2 of 1907</p>
-          </div>
-          <p className="text-xs text-muted-foreground">
-            All property transactions are conducted under the supervision of our registered legal representative in compliance with Sri Lankan property law.
-          </p>
-        </CardContent>
-      </Card>
+
+            <p className="text-xs text-muted-foreground">
+              {property.lawyers.address || 'All property transactions are conducted under the supervision of our registered legal representative.'}
+            </p>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Inquiry Form - Commented out for demo */}
       {/*

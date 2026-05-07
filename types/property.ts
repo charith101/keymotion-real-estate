@@ -18,6 +18,7 @@ export interface Property {
   featured: boolean
   views_count: number
   lawyer_id: string | null
+  link?: string | null
   created_at: string
   updated_at: string
 }

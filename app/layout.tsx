@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     default: 'Key Motion Real Estate | Properties in Sri Lanka',
     template: '%s | Key Motion Real Estate',
   },
-  description: 'Find your dream property in Sri Lanka. Browse land, houses, apartments, and commercial properties for sale, rent, or lease.',
+  description: 'Find your dream property in Ahangama, Midigama And Kabalana Sri Lanka. Buy, sell, rent, or lease lands, luxury villas, and thriving businesses with ease.',
   keywords: ['real estate', 'Sri Lanka', 'property', 'land', 'house', 'apartment', 'commercial', 'rent', 'sale', 'lease'],
   authors: [{ name: 'Key Motion Real Estate' }],
   creator: 'Key Motion Real Estate',
@@ -25,12 +25,12 @@ export const metadata: Metadata = {
     url: 'https://keymotionrealestate.com',
     siteName: 'Key Motion Real Estate',
     title: 'Key Motion Real Estate | Properties in Sri Lanka',
-    description: 'Find your dream property in Sri Lanka. Browse land, houses, apartments, and commercial properties for sale, rent, or lease.',
+    description: 'Find your dream property in Ahangama, Midigama And Kabalana Sri Lanka. Buy, sell, rent, or lease lands, luxury villas, and thriving businesses with ease.',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Key Motion Real Estate | Properties in Sri Lanka',
-    description: 'Find your dream property in Sri Lanka. Browse land, houses, apartments, and commercial properties for sale, rent, or lease.',
+    description: 'Find your dream property in Ahangama, Midigama And Kabalana Sri Lanka. Buy, sell, rent, or lease lands, luxury villas, and thriving businesses with ease.',
   },
   icons: {
     icon: [

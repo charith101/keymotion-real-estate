@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
-import XLSX from 'xlsx'
+import * as XLSX from 'xlsx'
 
 async function isAdmin(supabaseClient: any): Promise<boolean> {
   try {

@@ -4,6 +4,7 @@ import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import { getPropertyBySlug, getRelatedProperties } from '@/lib/queries/properties';
 import { createClient } from '@/lib/supabase/server';
+import { isPropertySaved } from '@/lib/actions/saved';
 import { ImageGallery } from './components/ImageGallery';
 import { PropertyHeader } from './components/PropertyHeader';
 import { PropertyPrice } from './components/PropertyPrice';
@@ -126,9 +127,13 @@ export default async function PropertyDetailPage({ params }: {params: Promise<{ 
     facts,
     nearbyAttractions: attractions,
     views: p.views_count ?? 0,
+    link: p.link ?? undefined,
+    lawyers: p.lawyers ?? undefined,
     createdAt: p.created_at,
     updatedAt: p.updated_at,
   }
+
+  const initialIsSaved = await isPropertySaved(p.id);
 
   // related
   const relatedCards = await getRelatedProperties(property.id, property.district, property.property_type)
@@ -206,7 +211,7 @@ export default async function PropertyDetailPage({ params }: {params: Promise<{ 
           <div className="grid gap-8 lg:grid-cols-3">
             {/* Main Content */}
             <div className="lg:col-span-2 space-y-8">
-              <PropertyHeader property={clientProperty} />
+              <PropertyHeader property={clientProperty} initialIsSaved={initialIsSaved} />
               <PropertyPrice property={clientProperty} />
               <QuickStats property={clientProperty} />
               <PropertyDescription description={clientProperty.description} />
@@ -216,6 +221,7 @@ export default async function PropertyDetailPage({ params }: {params: Promise<{ 
               <PropertyMap 
                 latitude={clientProperty.latitude} 
                 longitude={clientProperty.longitude} 
+                mapUrl={clientProperty.link}
                 title={clientProperty.title}
                 address={clientProperty.address}
                 city={clientProperty.city}

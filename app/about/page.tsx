@@ -7,10 +7,10 @@ import { Button } from '@/components/ui/button';
 
 export const metadata: Metadata = {
   title: 'About Us',
-  description: 'Learn about Key Motion Real Estate, your trusted partner for real estate in Sri Lanka. We connect buyers, sellers, and tenants with their dream properties worldwide.',
+  description: 'Learn about Key Motion Real Estate, your trusted partner for real estate in Ahangama, Midigama And Kabalana Sri Lanka. We connect buyers, sellers, and tenants with their dream properties worldwide.',
   openGraph: {
     title: 'About Us | Key Motion Real Estate',
-    description: 'Learn about Key Motion Real Estate, your trusted partner for real estate in Sri Lanka.',
+    description: 'Learn about Key Motion Real Estate, your trusted partner for real estate in Ahangama, Midigama And Kabalana Sri Lanka.',
     type: 'website',
   },
 };

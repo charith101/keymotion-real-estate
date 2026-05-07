@@ -198,7 +198,7 @@ export async function getPropertyBySlug(slug: string): Promise<PropertyDetail | 
     const { data: propData, error: propError } = await supabase
       .from('properties')
       .select(
-        `id,slug,title,description,property_type,listing_type,status,price_lkr,price_period,land_area_perches,land_area_acres,floor_area_sqft,bedrooms,bathrooms,district,city,address,latitude,longitude,featured,views_count,lawyer_id,created_at,updated_at`
+        `id,slug,title,description,property_type,listing_type,status,price_lkr,price_period,land_area_perches,land_area_acres,floor_area_sqft,bedrooms,bathrooms,district,city,address,latitude,longitude,featured,views_count,lawyer_id,link,created_at,updated_at`
       )
       .eq('slug', slug)
       .eq('status', 'active')
@@ -294,6 +294,7 @@ export async function getPropertyBySlug(slug: string): Promise<PropertyDetail | 
       featured: property.featured,
       views_count: property.views_count,
       lawyer_id: property.lawyer_id,
+      link: property.link ?? null,
       created_at: property.created_at,
       updated_at: property.updated_at,
       property_images: (imagesError || !images) ? [] : (images as TPropertyImage[]),
